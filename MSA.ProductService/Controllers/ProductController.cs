@@ -1,5 +1,7 @@
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using MSA.Common.Contracts.Domain;
+using MSA.Common.Contracts.Domain.Events.Product;
 using MSA.ProductService.Dtos;
 using MSA.ProductService.Entities;
 
@@ -9,9 +11,11 @@ namespace MSA.ProductService.Controllers;
 public class ProductController : ControllerBase
 {
     private readonly IRepository<Product> _repository;
-    public ProductController(IRepository<Product> repository)
+    private readonly IPublishEndpoint publishEndpoint;
+    public ProductController(IRepository<Product> repository, IPublishEndpoint publishEndpoint)
     {
         _repository = repository;
+        this.publishEndpoint = publishEndpoint;
     }
     [HttpGet]
     public async Task<IEnumerable<ProductDto>> GetAsync()
@@ -38,6 +42,7 @@ public class ProductController : ControllerBase
             CreatedDate = DateTimeOffset.UtcNow
         };
         await _repository.CreateAsync(product);
+        await publishEndpoint.Publish(new ProductCreated { ProductId = product.Id });
         return CreatedAtAction(nameof(PostAsync), product.AsDto());
     }
 }

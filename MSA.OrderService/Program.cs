@@ -3,6 +3,7 @@ using MSA.OrderService.Domain;
 using MSA.OrderService.Infrastructure.Data;
 using MSA.Common.PostgresMassTransit.PostgresDB;
 using MSA.OrderService.Services;
+using MSA.Common.PostgresMassTransit.MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,9 @@ PostgresDBSetting serviceSetting = builder.Configuration.GetSection(nameof(Postg
 builder.Services
         .AddPostgres<MainDbContext>()
         .AddPostgresRepositories<MainDbContext, Order>()
-        .AddPostgresUnitofWork<MainDbContext>();
+        .AddPostgresRepositories<MainDbContext, Product>()
+        .AddPostgresUnitofWork<MainDbContext>()
+        .AddMassTransitWithRabbitMQ();
 
 builder.Services.AddControllers(options =>
 {
@@ -37,6 +40,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.MapControllers();
 
 app.Run();

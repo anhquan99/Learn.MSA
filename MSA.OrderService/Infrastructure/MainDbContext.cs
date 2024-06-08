@@ -7,6 +7,7 @@ public class MainDbContext : AppDbContextBase
 {
     private readonly string _uuidGenerator = "uuid-ossp";
     private readonly string _uuidAlgorithm = "uuid_generate_v4()";
+    private readonly string uuid = "uuid";
     private readonly IConfiguration configuration;
     public MainDbContext(IConfiguration configuration, DbContextOptions options) : base(configuration, options)
     {
@@ -24,14 +25,19 @@ public class MainDbContext : AppDbContextBase
         modelBuilder.Entity<Order>().ToTable("orders");
         modelBuilder.Entity<Order>().HasKey(x => x.Id);
         modelBuilder.Entity<Order>().Property(x => x.Id)
-                                        .HasColumnType("uuid");
+                                        .HasColumnType(uuid);
 
         // Order details
         modelBuilder.Entity<OrderDetail>().ToTable("order_details");
         modelBuilder.Entity<OrderDetail>().HasKey(x => x.Id);
         modelBuilder.Entity<OrderDetail>().Property(x => x.Id)
-                                            .HasColumnType("uuid")
+                                            .HasColumnType(uuid)
                                             .HasDefaultValueSql(_uuidAlgorithm);
+
+        // Product
+        modelBuilder.Entity<Product>().ToTable("products");
+        modelBuilder.Entity<Product>().HasKey(x => x.Id);
+        modelBuilder.Entity<Product>().Property(x => x.Id).HasColumnType(uuid);
 
         // Relationship
         modelBuilder.Entity<Order>().HasMany(x => x.OrderDetails);

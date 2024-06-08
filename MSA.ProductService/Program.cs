@@ -1,12 +1,14 @@
 using MSA.ProductService.Entities;
 using MSA.Common.MongoDB;
-using MSA.Common.Contracts.Domain;
+using MSA.Common.PostgresMassTransit.MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddMongo().AddRepositories<Product>("product");
+builder.Services.AddMongo()
+                .AddRepositories<Product>("product")
+                .AddMassTransitWithRabbitMQ();
 builder.Services.AddControllers(options =>
 {
     options.SuppressAsyncSuffixInActionNames = false;
@@ -24,11 +26,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
+app.MapControllers();
 
 app.Run();
