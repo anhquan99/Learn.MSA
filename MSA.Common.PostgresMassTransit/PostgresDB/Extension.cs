@@ -1,3 +1,5 @@
+using System.Net.NetworkInformation;
+using MassTransit.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +33,11 @@ public static class Extensions
                                                                                     where TEntity : class, IEntity
     {
         services.AddScoped<IRepository<TEntity>, PostgresRepository<TDbContext, TEntity>>();
+        return services;
+    }
+    public static IServiceCollection AddPostgresUnitofWork<TDbContext>(this IServiceCollection services) where TDbContext : AppDbContextBase
+    {
+        services.AddScoped<PostgresUnitOfWork<TDbContext>, PostgresUnitOfWork<TDbContext>>();
         return services;
     }
 }
