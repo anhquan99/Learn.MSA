@@ -40,8 +40,8 @@ builder.Services.AddSwaggerGen(options =>
         {
             AuthorizationCode = new OpenApiOAuthFlow
             {
-                AuthorizationUrl = new Uri($"{srvUrlsSetting.IndentityServiceUrl}/connect/authorize"),
-                TokenUrl = new Uri($"{srvUrlsSetting.IndentityServiceUrl}/connext/token"),
+                AuthorizationUrl = new Uri($"{srvUrlsSetting.IdentityServiceUrl}/connect/authorize"),
+                TokenUrl = new Uri($"{srvUrlsSetting.IdentityServiceUrl}/connext/token"),
                 Scopes = new Dictionary<string, string>{
                     {"productapi.read", "Access read operations"},
                     {"productapi.write", "Access write operations"}

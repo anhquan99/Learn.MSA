@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSA.IdentityServer", "MSA.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSA.Common.Security", "MSA.Common.Security\MSA.Common.Security.csproj", "{9AAF16FD-4A23-490F-9DE6-C867D899000E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSA.ReverseProxy", "MSA.ReverseProxy\MSA.ReverseProxy.csproj", "{DA4E5460-6803-4587-9904-2587CCEBA6FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{9AAF16FD-4A23-490F-9DE6-C867D899000E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAF16FD-4A23-490F-9DE6-C867D899000E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAF16FD-4A23-490F-9DE6-C867D899000E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA4E5460-6803-4587-9904-2587CCEBA6FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA4E5460-6803-4587-9904-2587CCEBA6FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA4E5460-6803-4587-9904-2587CCEBA6FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA4E5460-6803-4587-9904-2587CCEBA6FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

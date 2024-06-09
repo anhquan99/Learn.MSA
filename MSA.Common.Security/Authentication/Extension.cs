@@ -17,7 +17,7 @@ public static class Extensions
                 var config = srvProvider.GetService<IConfiguration>();
                 var srvUrlsSetting = config.GetSection(nameof(ServiceUrlsSetting)).Get<ServiceUrlsSetting>();
 
-                options.Authority = srvUrlsSetting.IndentityServiceUrl;
+                options.Authority = srvUrlsSetting.IdentityServiceUrl;
                 options.RequireHttpsMetadata = false;
 
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
