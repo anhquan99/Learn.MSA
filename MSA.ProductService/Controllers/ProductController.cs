@@ -25,7 +25,7 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Guid>> GetByIdAsync(Guid id)
     {
-        if (id == null) return BadRequest();
+        if (id == null) return BadRequest("Missing id field.");
         var product = (await _repository.GetAsync(id));
         if (product == null) return Ok(Guid.Empty);
         return Ok(product.Id);

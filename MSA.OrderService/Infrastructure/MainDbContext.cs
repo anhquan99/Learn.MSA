@@ -1,3 +1,5 @@
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using MSA.Common.PostgresMassTransit.PostgresDB;
 using MSA.OrderService.Domain;
@@ -15,6 +17,7 @@ public class MainDbContext : AppDbContextBase
     }
     public DbSet<Order> Orders { get; set; } = default;
     public DbSet<OrderDetail> OrderDetails { get; set; } = default;
+    public DbSet<OutboxState> OutboxStates { get; set; } = default;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -41,5 +44,10 @@ public class MainDbContext : AppDbContextBase
 
         // Relationship
         modelBuilder.Entity<Order>().HasMany(x => x.OrderDetails);
+
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+
     }
 }
