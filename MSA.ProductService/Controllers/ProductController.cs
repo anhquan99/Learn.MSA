@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MSA.Common.Contracts.Domain;
 using MSA.Common.Contracts.Domain.Events.Product;
@@ -8,6 +9,7 @@ using MSA.ProductService.Entities;
 namespace MSA.ProductService.Controllers;
 [ApiController]
 [Route("v1/product")]
+[Authorize]
 public class ProductController : ControllerBase
 {
     private readonly IRepository<Product> _repository;
@@ -18,6 +20,7 @@ public class ProductController : ControllerBase
         this.publishEndpoint = publishEndpoint;
     }
     [HttpGet]
+    [Authorize("read_access")]
     public async Task<IEnumerable<ProductDto>> GetAsync()
     {
         return (await _repository.GetAllAsync()).Select(x => x.AsDto());
