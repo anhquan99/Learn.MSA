@@ -23,7 +23,6 @@ builder.Services
         .AddPostgresRepositories<MainDbContext, Product>()
         .AddPostgresUnitofWork<MainDbContext>()
         // .AddMassTransitWithRabbitMQ();
-
         .AddMassTransitWithPostgresOutbox<MainDbContext>(cfg =>
         {
             cfg.AddSagaStateMachine<OrderStateMachine, OrderState>()

@@ -1,67 +1,43 @@
-using System.Reflection;
-using MassTransit;
+using System.Net.NetworkInformation;
+using MassTransit.Serialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MSA.Common.Contracts.Domain;
 using MSA.Common.Contracts.Settings;
-using MSA.Common.PostgresMassTransit.PostgresDB;
-using MSA.Common.Settings;
+using MSA.Common.Domain;
 
-namespace MSA.Common.PostgresMassTransit.MassTransit;
+namespace MSA.Common.PostgresMassTransit.PostgresDB;
 
 public static class Extensions
 {
-    public static IServiceCollection AddMassTransitWithRabbitMQ(this IServiceCollection services)
+    public static IServiceCollection AddPostgres<TDbContext>(this IServiceCollection services) where TDbContext : DbContext
     {
-        services.AddMassTransit(config =>
-        {
-            config.AddConsumers(Assembly.GetEntryAssembly());
-            config.UsingRabbitMq((context, configurator) =>
+        var srvProvider = services.BuildServiceProvider();
+        var config = srvProvider.GetService<IConfiguration>();
+        var pgSettings = config.GetSection(nameof(PostgresDBSetting)).Get<PostgresDBSetting>();
+
+        services
+            .AddEntityFrameworkNpgsql()
+            .AddDbContext<TDbContext>(opt =>
             {
-                var configuration = context.GetService<IConfiguration>();
-                var serviceSetting = configuration.GetSection(nameof(ServiceSetting)).Get<ServiceSetting>();
-                RabbitMQSetting rabbitMQSetting = configuration.GetSection(nameof(RabbitMQSetting)).Get<RabbitMQSetting>();
-                configurator.Host(rabbitMQSetting.Host);
-                configurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(serviceSetting.ServiceName, false));
-                configurator.UseMessageRetry(policy =>
+                opt.UseNpgsql(pgSettings.ConnectionString, pgOpt =>
                 {
-                    policy.Interval(3, TimeSpan.FromSeconds(3));
+                    pgOpt.MigrationsAssembly(typeof(TDbContext).Assembly.GetName().Name);
                 });
             });
-        });
         return services;
     }
-    public static IServiceCollection AddMassTransitWithPostgresOutbox<TDbContext>(
-        this IServiceCollection services,
-        Action<IBusRegistrationConfigurator> furtherConfig = null)
-        where TDbContext : AppDbContextBase
+    public static IServiceCollection AddPostgresRepositories<TDbContext, TEntity>(this IServiceCollection services)
+                                                                                    where TDbContext : AppDbContextBase
+                                                                                    where TEntity : class, IEntity
     {
-        services.AddMassTransit(configure =>
-        {
-            configure.AddConsumers(Assembly.GetEntryAssembly());
-
-            configure.UsingRabbitMq((context, configurator) =>
-            {
-                var configuration = context.GetService<IConfiguration>();
-                var serviceSetting = configuration.GetSection(nameof(ServiceSetting)).Get<ServiceSetting>();
-                RabbitMQSetting rabitMQSetting = configuration.GetSection(nameof(RabbitMQSetting)).Get<RabbitMQSetting>();
-                configurator.Host(rabitMQSetting.Host);
-                configurator.ConfigureEndpoints(context,
-                    new KebabCaseEndpointNameFormatter(serviceSetting.ServiceName, false));
-                configurator.UseMessageRetry(retryPoilicy =>
-                {
-                    retryPoilicy.Interval(3, TimeSpan.FromSeconds(10));
-                });
-            });
-
-            configure.AddEntityFrameworkOutbox<TDbContext>(o =>
-            {
-                o.UsePostgres();
-                o.UseBusOutbox();
-            });
-
-            furtherConfig?.Invoke(configure);
-        });
-
+        services.AddScoped<IRepository<TEntity>, PostgresRepository<TDbContext, TEntity>>();
+        return services;
+    }
+    public static IServiceCollection AddPostgresUnitofWork<TDbContext>(this IServiceCollection services) where TDbContext : AppDbContextBase
+    {
+        services.AddScoped<PostgresUnitOfWork<TDbContext>, PostgresUnitOfWork<TDbContext>>();
         return services;
     }
 }
